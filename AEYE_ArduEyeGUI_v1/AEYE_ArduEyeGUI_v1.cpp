@@ -74,32 +74,49 @@ void ArduEyeGUI::stop(void)
   detected=0;	//arduGUI not detected
 }
 
-void ArduEyeGUI::send_escape_char(char char_out)
+void ArduEyeGUI::send_escape_char(byte char_out)
 { 
   Serial.write(ESC);		//send escape char
   Serial.write(char_out);	//send special char
 }
 
+void ArduEyeGUI::send_data_byte(byte data_out)
+{
+  if(data_out!=ESC)
+	Serial.write(data_out);		//send data byte
+  else
+  {
+	Serial.write(data_out);		//duplicate escape character
+	Serial.write(data_out);
+  }
+
+}
+
 void ArduEyeGUI::sendImage(byte rows,byte cols,short *pixels,short num_points)
 {
-  short i;
+
+union{	//to get the signed bytes to format properly, use a union
+   short i_out;
+   byte b[2];
+  }u;
   
   if(detected)	//if GUI is detected, send bytes
   {
   	send_escape_char(START);	//send start packet
   
-  	Serial.write(IMAGE);		//write image header
-  	Serial.write(rows);		//write rows of image
-  	Serial.write(cols);		//write cols of image
+  	send_data_byte(IMAGE);		//write image header
+  	send_data_byte(rows);		//write rows of image
+  	send_data_byte(cols);		//write cols of image
   	
 	//for some reason, Serial.write(byte_array,num)
 	//doesn't work over a certain number of bytes
 	//so send bytes one at a time
-	for(i=0;i<num_points;i++)	
+	for(int i=0;i<num_points;i++)	
 	{
- 	  Serial.write((byte)((pixels[i]>>8)&0xFF));	//upper 8 bits
-	  Serial.write((byte)((pixels[i])&0xFF));		//lower 8 bits
-	}
+	  u.i_out=pixels[i];		//put two bytes into union
+	  send_data_byte(u.b[0]);	//send first byte 
+	  send_data_byte(u.b[1]);	//send second byte
+ 	}
   
   	send_escape_char(STOP);		//send stop packet
   }
@@ -112,10 +129,15 @@ void ArduEyeGUI::sendPoints(byte rows,byte cols,byte *points,short num_points)
   {
  	send_escape_char(START);		//send start packet
 	
- 	Serial.write(POINTS);			//send points header
- 	Serial.write(rows);			//send rows of image
- 	Serial.write(cols);			//send cols of image
- 	Serial.write(points,num_points*2);	//write points arrau
+ 	send_data_byte(POINTS);			//send points header
+ 	send_data_byte(rows);			//send rows of image
+ 	send_data_byte(cols);			//send cols of image
+	
+	for(int i=0;i<num_points*2;i+=2)
+	{
+	  send_data_byte(points[i]);
+	  send_data_byte(points[i+1]);
+	}
   
   	send_escape_char(STOP);			//send stop packet
   }
@@ -133,11 +155,16 @@ void ArduEyeGUI::sendVectors(byte rows,byte cols,char *vector,short num_vectors)
   {
   	send_escape_char(START);		//send start packet
 
-  	Serial.write(VECTORS);			//send vector header
-  	Serial.write(rows);			//send rows of vectors
-  	Serial.write(cols);			//send cols of vectors
-  	Serial.write((byte*)vector,num_vectors*2);
-  
+  	send_data_byte(VECTORS);		//send vector header
+  	send_data_byte(rows);			//send rows of vectors
+  	send_data_byte(cols);			//send cols of vectors
+
+  	for(int i=0;i<num_vectors*2;i+=2)
+	{
+	  send_data_byte((byte)vector[i]);
+	  send_data_byte((byte)vector[i+1]);
+	}
+
   	send_escape_char(STOP);			//send stop packet
   }
 }

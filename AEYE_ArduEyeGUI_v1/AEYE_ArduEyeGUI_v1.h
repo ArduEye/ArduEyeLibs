@@ -72,7 +72,8 @@ class ArduEyeGUI
   // library-accessible "private" interface
   private:
     int detected;				//whether the GUI is detected
-    void send_escape_char(char);	//send escape char plus special 						//char	
+    void send_escape_char(byte);	//send escape char plus special char	
+    void send_data_byte(byte);	//send data (repeats ESC char)
     
 };
 
