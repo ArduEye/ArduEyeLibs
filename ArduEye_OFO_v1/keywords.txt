@@ -1,0 +1,25 @@
+#######################################
+# Syntax Coloring Map ArduEyeSMH
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+ArduEyeOFO	KEYWORD1
+ArduEye_OFO	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+LPF	KEYWORD2
+IIA_1D	KEYWORD2
+IIA_Plus_2D	KEYWORD2
+LK_Plus_2D	KEYWORD2
+IIA_Square_2D	KEYWORD2
+LK_Square_2D	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
