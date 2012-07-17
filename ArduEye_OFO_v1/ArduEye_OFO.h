@@ -76,8 +76,8 @@ class ArduEyeOFOClass
 
 	// A simplified version of Srinivasan's Image Interpolation
 	// algorithm for a 1D image
-	void IIA_1D(short *curr_img, short *last_img, char numpix, short 			scale, int *out);
-	void IIA_1D(char *curr_img, char *last_img, char numpix, short 			scale, int *out);
+	void IIA_1D(short *curr_img, short *last_img, char numpix, short 			scale, short *out);
+	void IIA_1D(char *curr_img, char *last_img, char numpix, short 			scale, short *out);
 
 	// A simplified version of Srinivasan's Image Interpolation
 	// algorithm for a 2D image using the standard plus interpolation

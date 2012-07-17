@@ -85,7 +85,7 @@ void ArduEyeOFOClass::LPF(short *filtered_OF,short *new_OF,float alpha)
 //	out: pointer to integer value for output.
 /*********************************************************************/
 
-void ArduEyeOFOClass::IIA_1D(short *curr_img, short *last_img, char numpix, short 					scale, int *out) 
+void ArduEyeOFOClass::IIA_1D(short *curr_img, short *last_img, char numpix, short 					scale, short *out) 
 {
   short *pleft,*pright,*pone,*ptwo;
   long top,bottom;
@@ -134,7 +134,7 @@ void ArduEyeOFOClass::IIA_1D(short *curr_img, short *last_img, char numpix, shor
 //	out: pointer to integer value for output.
 /*********************************************************************/
 
-void ArduEyeOFOClass::IIA_1D(char *curr_img, char *last_img, char 				numpix, short scale, int *out) 
+void ArduEyeOFOClass::IIA_1D(char *curr_img, char *last_img, char 				numpix, short scale, short *out) 
 {
   char *pleft,*pright,*pone,*ptwo;
   long top,bottom;
