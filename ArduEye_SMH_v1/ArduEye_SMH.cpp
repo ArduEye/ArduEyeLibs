@@ -475,6 +475,11 @@ void ArduEyeSMHClass::getImage(short *img, unsigned char rowstart, 					unsigned
   
   if(ADCType==SMH1_ADCTYPE_ONBOARD)	//if using onboard ADC
      setAnalogInput(anain);		//set analog input to Arduino
+  else if(ADCType==SMH1_ADCTYPE_MCP3201_2)
+  { 
+     setAnalogInput(anain);
+     ADC_SS_PORT |= ADC_SS; // make sure SS is high
+  }
   else	//if using external ADC
   {
     setADCInput(anain,1); // enable chip
@@ -518,6 +523,7 @@ void ArduEyeSMHClass::getImage(short *img, unsigned char rowstart, 					unsigned
            ADC_SS_PORT |= ADC_SS;   // SS high to stop
           break;
         case SMH1_ADCTYPE_MCP3201:  // Microchip 12 bit
+        case SMH1_ADCTYPE_MCP3201_2:
 	     ADC_SS_PORT &= ~ADC_SS;  // turn SS low to start conversion
            chigh=SPI.transfer(0);   // get high byte
            clow=SPI.transfer(0);    // get low byte
@@ -538,10 +544,245 @@ void ArduEyeSMHClass::getImage(short *img, unsigned char rowstart, 					unsigned
     incValue(rowskip); // go to next row
   }
 
-  if(ADCType!=SMH1_ADCTYPE_ONBOARD)
+  if((ADCType!=SMH1_ADCTYPE_ONBOARD)&&(ADCType!=SMH1_ADCTYPE_MCP3201_2))
    setADCInput(anain,0); // disable chip
 
 }
+
+/*********************************************************************/
+//	getImageRowSum
+//	This function acquires a box section of a Stonyman or Hawksbill 
+//	and saves to image array img.  However, each row of the image
+//	is summed and returned as a single value.
+//	Note that images are read out in 
+//	raster manner (e.g. row wise) and stored as such in a 1D array. 
+//	In this case the pointer img points to the output array. 
+//
+//	VARIABLES: 
+//	img (output): pointer to image array, an array of signed shorts
+//	rowstart: first row to acquire
+//	numrows: number of rows to acquire
+//	rowskip: skipping between rows (useful if binning is used)
+//	colstart: first column to acquire
+//	numcols: number of columns to acquire
+//	colskip: skipping between columns
+//	ADCType: which ADC to use, defined ADC_TYPES
+//	anain (0,1,2,3): which analog input to use
+//	
+//	EXAMPLES:
+//	getImage(img,16,8,1,24,8,1,SMH1_ADCTYPE_ONBOARD,0): 
+//	Grab an 8x8 window of pixels at raw resolution starting at row 
+//	16, column 24, from chip using onboard ADC at input 0
+//	getImage(img,0,14,8,0,14,8,SMH1_ADCTYPE_MCP3201,2): 
+//	Grab entire Stonyman chip when using
+//	8x8 binning. Grab from input 2.
+/*********************************************************************/
+
+void ArduEyeSMHClass::getImageRowSum(short *img, unsigned char rowstart, unsigned char numrows, unsigned char rowskip, unsigned char colstart, unsigned char numcols, unsigned char colskip, char ADCType,char anain) 
+{
+  short *pimg = img; // pointer to output image array
+  short val,total=0;
+  unsigned char chigh,clow;
+  unsigned char row,col;
+  
+  if(ADCType==SMH1_ADCTYPE_ONBOARD)	//if using onboard ADC
+     setAnalogInput(anain);		//set analog input to Arduino
+  else if(ADCType==SMH1_ADCTYPE_MCP3201_2)
+  { 
+     setAnalogInput(anain);
+     ADC_SS_PORT |= ADC_SS; // make sure SS is high
+  }
+  else	//if using external ADC
+  {
+    setADCInput(anain,1); // enable chip
+    ADC_SS_PORT |= ADC_SS; // make sure SS is high
+  }
+
+  // Go to first row
+  setPointerValue(SMH_SYS_ROWSEL,rowstart);
+ 
+  // Loop through all rows
+  for (row=0; row<numrows; ++row) {
+    
+    // Go to first column
+    setPointerValue(SMH_SYS_COLSEL,colstart);
+  
+    total=0;
+    
+    // Loop through all columns
+    for (col=0; col<numcols; ++col) {
+      
+      // settling delay
+      delayMicroseconds(1);
+
+      // pulse amplifier if needed
+	if (useAmp) 
+        pulseInphi(2);
+      
+      // get data value
+      delayMicroseconds(1);
+      
+      // get pixel value from ADC
+      switch (ADCType) 
+      {
+        case SMH1_ADCTYPE_ONBOARD:	//onboard Arduino ADC
+           val = analogRead(anain); // acquire pixel
+	    break;
+        case SMH1_ADCTYPE_MCP3001:  // Micrchip 10 bit
+           ADC_SS_PORT &= ~ADC_SS;  // turn SS low to start conversion
+           chigh=SPI.transfer(0);   // get high byte
+           clow=SPI.transfer(0);    // get low byte
+           val = ((short)(chigh&0x1F))<<5;
+           val += (clow&0xF8)>>3;
+           ADC_SS_PORT |= ADC_SS;   // SS high to stop
+          break;
+        case SMH1_ADCTYPE_MCP3201:  // Microchip 12 bit
+        case SMH1_ADCTYPE_MCP3201_2:
+	     ADC_SS_PORT &= ~ADC_SS;  // turn SS low to start conversion
+           chigh=SPI.transfer(0);   // get high byte
+           clow=SPI.transfer(0);    // get low byte
+           val = ((short)(chigh&0x1F))<<7;
+           val += (clow&0xFE)>>1;
+	     ADC_SS_PORT |= ADC_SS;   // SS high to stop
+          break;
+        default:
+           val = 555;
+          break;
+      }
+      
+      total+=val;	//sum values along row
+      incValue(colskip); // go to next column
+    }
+	
+    *pimg = total>>4; // store pixel divide to avoid overflow
+    pimg++; // advance pointer
+
+    setPointer(SMH_SYS_ROWSEL);
+    incValue(rowskip); // go to next row
+  }
+
+  if((ADCType!=SMH1_ADCTYPE_ONBOARD)&&(ADCType!=SMH1_ADCTYPE_MCP3201_2))
+   setADCInput(anain,0); // disable chip
+
+}
+
+/*********************************************************************/
+//	getImageColSum
+//	This function acquires a box section of a Stonyman or Hawksbill 
+//	and saves to image array img.  However, each col of the image
+//	is summed and returned as a single value.
+//	Note that images are read out in 
+//	raster manner (e.g. row wise) and stored as such in a 1D array. 
+//	In this case the pointer img points to the output array. 
+//
+//	VARIABLES: 
+//	img (output): pointer to image array, an array of signed shorts
+//	rowstart: first row to acquire
+//	numrows: number of rows to acquire
+//	rowskip: skipping between rows (useful if binning is used)
+//	colstart: first column to acquire
+//	numcols: number of columns to acquire
+//	colskip: skipping between columns
+//	ADCType: which ADC to use, defined ADC_TYPES
+//	anain (0,1,2,3): which analog input to use
+//	
+//	EXAMPLES:
+//	getImage(img,16,8,1,24,8,1,SMH1_ADCTYPE_ONBOARD,0): 
+//	Grab an 8x8 window of pixels at raw resolution starting at row 
+//	16, column 24, from chip using onboard ADC at input 0
+//	getImage(img,0,14,8,0,14,8,SMH1_ADCTYPE_MCP3201,2): 
+//	Grab entire Stonyman chip when using
+//	8x8 binning. Grab from input 2.
+/*********************************************************************/
+
+void ArduEyeSMHClass::getImageColSum(short *img, unsigned char rowstart, 					unsigned char numrows, unsigned char 					rowskip, unsigned char colstart, unsigned 					char numcols, unsigned char colskip, char 					ADCType,char anain) 
+{
+  short *pimg = img; // pointer to output image array
+  short val,total=0;
+  unsigned char chigh,clow;
+  unsigned char row,col;
+  
+  if(ADCType==SMH1_ADCTYPE_ONBOARD)	//if using onboard ADC
+     setAnalogInput(anain);		//set analog input to Arduino
+  else if(ADCType==SMH1_ADCTYPE_MCP3201_2)
+  { 
+     setAnalogInput(anain);
+     ADC_SS_PORT |= ADC_SS; // make sure SS is high
+  }
+  else	//if using external ADC
+  {
+    setADCInput(anain,1); // enable chip
+    ADC_SS_PORT |= ADC_SS; // make sure SS is high
+  }
+
+  // Go to first col
+  setPointerValue(SMH_SYS_COLSEL,colstart);
+ 
+  // Loop through all cols
+  for (col=0; col<numcols; ++col) {
+    
+    // Go to first row
+    setPointerValue(SMH_SYS_ROWSEL,rowstart);
+  
+    total=0;
+    
+    // Loop through all rows
+    for (row=0; row<numrows; ++row) {
+      
+      // settling delay
+      delayMicroseconds(1);
+
+      // pulse amplifier if needed
+	if (useAmp) 
+        pulseInphi(2);
+      
+      // get data value
+      delayMicroseconds(1);
+      
+      // get pixel value from ADC
+      switch (ADCType) 
+      {
+        case SMH1_ADCTYPE_ONBOARD:	//onboard Arduino ADC
+           val = analogRead(anain); // acquire pixel
+	    break;
+        case SMH1_ADCTYPE_MCP3001:  // Micrchip 10 bit
+           ADC_SS_PORT &= ~ADC_SS;  // turn SS low to start conversion
+           chigh=SPI.transfer(0);   // get high byte
+           clow=SPI.transfer(0);    // get low byte
+           val = ((short)(chigh&0x1F))<<5;
+           val += (clow&0xF8)>>3;
+           ADC_SS_PORT |= ADC_SS;   // SS high to stop
+          break;
+        case SMH1_ADCTYPE_MCP3201:  // Microchip 12 bit
+        case SMH1_ADCTYPE_MCP3201_2:
+	     ADC_SS_PORT &= ~ADC_SS;  // turn SS low to start conversion
+           chigh=SPI.transfer(0);   // get high byte
+           clow=SPI.transfer(0);    // get low byte
+           val = ((short)(chigh&0x1F))<<7;
+           val += (clow&0xFE)>>1;
+	     ADC_SS_PORT |= ADC_SS;   // SS high to stop
+          break;
+        default:
+           val = 555;
+          break;
+      }
+      
+      total+=val;	//sum value along column
+      incValue(rowskip); // go to next row
+    }
+	
+    *pimg = total>>4; // store pixel
+    pimg++; // advance pointer
+
+    setPointer(SMH_SYS_COLSEL);
+    incValue(colskip); // go to next col
+  }
+
+  if((ADCType!=SMH1_ADCTYPE_ONBOARD)&&(ADCType!=SMH1_ADCTYPE_MCP3201_2))
+   setADCInput(anain,0); // disable chip
+
+}
+
 
 /*********************************************************************/
 //	findMax

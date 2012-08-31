@@ -102,6 +102,25 @@ void CYE_ImgShortCopy(short *A, short *B, unsigned short numpix) {
 	}
 }
 
+/*------------------------------------------------------------------------
+CYE_ImgShortCopy -- Copies image A to image B. OVERLOADED for CHAR
+VARIABLES:
+A: copy from image
+B: copy to image
+numpix: number of pixels e.g. rows * columns
+STATUS: UNTESTED
+*/
+void CYE_ImgShortCopy(char *A, char *B, unsigned short numpix) {
+	unsigned short pix;
+	char *pa,*pb;
+	pa=A; pb=B;
+	for (pix=0; pix<numpix; ++pix) {
+		*pb = *pa;
+		pa++; pb++;
+	}
+}
+
+
 
 //========================================================================
 // IMAGE DISPLAY AND DUMPING (FOR ARDUINO SERIAL MONITOR)

@@ -71,6 +71,24 @@ void ArduEyeOFOClass::LPF(short *filtered_OF,short *new_OF,float alpha)
 	(*filtered_OF)=(*filtered_OF)+((float)(*new_OF)-(*filtered_OF))				*alpha;
 }
 
+/*********************************************************************/
+//	Accumulate
+//	The current optical flow value is added to the accumulation sum
+//	only if it crosses a threshold
+/*********************************************************************/      
+short ArduEyeOFOClass::Accumulate(short *new_OF,short *acc_OF, short threshold)
+{
+    short reset=0;
+
+    if((*new_OF>threshold)||(*new_OF<-threshold))
+    {
+        *acc_OF+=*new_OF;
+        reset=1;
+    }
+
+    return reset;
+}
+
 
 /*********************************************************************/
 //	IIA_1D (short version)

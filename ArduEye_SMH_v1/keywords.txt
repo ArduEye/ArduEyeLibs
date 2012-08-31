@@ -16,6 +16,8 @@ begin	KEYWORD2
 calcMask	KEYWORD2
 applyMask	KEYWORD2
 getImage	KEYWORD2
+getImageRowSum	KEYWORD2
+getImageColSum	KEYWORD2
 findMax	KEYWORD2
 chipToMatlab	KEYWORD2
 sectionToMatlab	KEYWORD2

@@ -17,7 +17,7 @@ start 	KEYWORD2
 stop		KEYWORD2
 sendImage	KEYWORD2
 sendPoints	KEYWORD2
-sendVectors	KEYWORD2
+sendVectors KEYWORD2
 getCommand	KEYWORD2
 
 #######################################

@@ -46,6 +46,8 @@ February 17, 2012: includes Arduino.h or WProgram.h depending on Arduino IDE ver
 
 
 void CYE_ImgShortCopy(short *A, short *B, unsigned short numpix);
+void CYE_ImgShortCopy(char *A, char *B, unsigned short numpix);
+
 void CYE_ImgShortDumpAsciiSerial(short *img, short numrows, short numcolumns, short mini, short maxi);
 void CYE_ImgShortDumpMatlabSerial(short *img, unsigned char numrows, unsigned char numcols);
 void CYE_ImgShortFindMinMax(short *img, unsigned char numrows, unsigned char numcols, short *mini, short *maxi);

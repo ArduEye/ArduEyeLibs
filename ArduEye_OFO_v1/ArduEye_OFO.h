@@ -74,6 +74,9 @@ class ArduEyeOFOClass
 	// Low Pass Filters an OF value with coefficient alpha
       void LPF(short *filtered_OF,short *new_OF,float alpha);
 
+	// Optical Accumulation using thresholding
+      short Accumulate(short *new_OF,short *acc_OF,short threshold);
+
 	// A simplified version of Srinivasan's Image Interpolation
 	// algorithm for a 1D image
 	void IIA_1D(short *curr_img, short *last_img, char numpix, short 			scale, short *out);

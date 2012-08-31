@@ -157,8 +157,10 @@ policies, either expressed or implied, of Centeye, Inc.
 #define SMH1_ADCTYPE_ONBOARD 0
 // MCP3201, Microchip, 12bits, 100ksps
 #define SMH1_ADCTYPE_MCP3201 1
+// MCP3201, Microchip, 12bits, 100ksps, for ArduEye Bug v1.0
+#define SMH1_ADCTYPE_MCP3201_2 2
 // MCP3001, Microchip, 10bits, 200ksps
-#define SMH1_ADCTYPE_MCP3001 2
+#define SMH1_ADCTYPE_MCP3001 3
 
 /*********************************************************************/
 
@@ -249,6 +251,12 @@ public:
 
   //gets an image from the vision chip
   void getImage(short *img, unsigned char rowstart, unsigned char 	numrows, unsigned char rowskip, unsigned char colstart, unsigned 	char numcols, unsigned char colskip, char ADCType,char anain);
+
+  //gets a image from the vision chip, sums each row and returns one pixel for the row
+  void getImageRowSum(short *img, unsigned char rowstart, unsigned char 	numrows, unsigned char rowskip, unsigned char colstart, unsigned 	char numcols, unsigned char colskip, char ADCType,char anain);
+ 
+  //gets a image from the vision chip, sums each col and returns one pixel for the col
+  void getImageColSum(short *img, unsigned char rowstart, unsigned char 	numrows, unsigned char rowskip, unsigned char colstart, unsigned 	char numcols, unsigned char colskip, char ADCType,char anain);
 
   //takes an image and returns the maximum value row and col
   void findMax(unsigned char rowstart, unsigned char numrows, 	unsigned char rowskip, unsigned char colstart, unsigned char 	numcols, unsigned char colskip, char ADCType,char anain,unsigned 	char *max_row, unsigned char *max_col);
