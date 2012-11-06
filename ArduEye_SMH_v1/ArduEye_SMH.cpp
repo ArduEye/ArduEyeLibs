@@ -58,7 +58,7 @@ ArduEyeSMHClass ArduEyeSMH;
 //	are used.
 /*********************************************************************/
 
-void ArduEyeSMHClass::begin(short vref,short nbias,short aobias,char 	gain,char selamp)
+void ArduEyeSMHClass::begin(short vref,short nbias,short aobias,char gain,char selamp)
 {
   //set all digital pins to output
   RESP_DDR|=RESP;
@@ -150,7 +150,8 @@ void ArduEyeSMHClass::pulseInphi(char delay)
 
 /*********************************************************************/
 //	setPointerValue
-//	Sets the pointer to a register and sets the value of that        //	register
+//	Sets the pointer to a register and sets the value of that        
+//	register
 /*********************************************************************/
 
 void ArduEyeSMHClass::setPointerValue(char ptr,short val)
@@ -355,7 +356,8 @@ void ArduEyeSMHClass::setADCInput(char ADCInput,char state)
 /*********************************************************************/
 //	setBinning
 //	Configures binning in the focal plane using the VSW and HSW
-//	system registers. The super pixels are aligned with the top left //	of the image, e.g. "offset downsampling" is not used. This 
+//	system registers. The super pixels are aligned with the top left 
+//	of the image, e.g. "offset downsampling" is not used. This 
 //	function is for the Stonyman chip only. 
 //	VARIABLES:
 //	hbin: set to 1, 2, 4, or 8 to bin horizontally by that amount
@@ -412,7 +414,7 @@ void ArduEyeSMHClass::setBinning(short hbin,short vbin)
 //	which can then be used with the applMask function. 
 /*********************************************************************/
 
-void ArduEyeSMHClass::calcMask(short *img, short size, unsigned char 	*mask,short *mask_base)
+void ArduEyeSMHClass::calcMask(short *img, short size, unsigned char *mask,short *mask_base)
 {
  	*mask_base = 10000; // e.g. "high"
 
@@ -427,24 +429,27 @@ void ArduEyeSMHClass::calcMask(short *img, short size, unsigned char 	*mask,shor
 
 /*********************************************************************/
 //	applyMask
-//	given the "mask" and "mask_base" variables calculated in        //	calcMask, and a current image, this function will subtract the
+//	given the "mask" and "mask_base" variables calculated in        
+//	calcMask, and a current image, this function will subtract the
 //	mask to provide a calibrated image.
 /*********************************************************************/
 
-void ArduEyeSMHClass::applyMask(short *img, short size, unsigned char 	*mask, short mask_base)
+void ArduEyeSMHClass::applyMask(short *img, short size, unsigned char *mask, short mask_base)
 {
 	 // Subtract calibration mask
   	 for (int i=0; i<size;++i) 
 	{
     		img[i] -= mask_base+mask[i];  //subtract FPN mask
-    		img[i]=-img[i];          //negate image so it displays 						//	properly
- 	 }
+    		img[i]=-img[i];          //negate image so it displays properly
+ 	}
 }
 
 /*********************************************************************/
 //	getImage
 //	This function acquires a box section of a Stonyman or Hawksbill 
-//	and saves to image array img.  Note that images are read out in //	raster manner (e.g. row wise) and stored as such in a 1D array. //	In this case the pointer img points to the output array. 
+//	and saves to image array img.  Note that images are read out in 
+//	raster manner (e.g. row wise) and stored as such in a 1D array. 
+//	In this case the pointer img points to the output array. 
 //
 //	VARIABLES: 
 //	img (output): pointer to image array, an array of signed shorts
@@ -466,7 +471,7 @@ void ArduEyeSMHClass::applyMask(short *img, short size, unsigned char 	*mask, sh
 //	8x8 binning. Grab from input 2.
 /*********************************************************************/
 
-void ArduEyeSMHClass::getImage(short *img, unsigned char rowstart, 					unsigned char numrows, unsigned char 					rowskip, unsigned char colstart, unsigned 					char numcols, unsigned char colskip, char 					ADCType,char anain) 
+void ArduEyeSMHClass::getImage(short *img, unsigned char rowstart, unsigned char numrows, unsigned char rowskip, unsigned char colstart, unsigned char numcols, unsigned char colskip, char ADCType,char anain) 
 {
   short *pimg = img; // pointer to output image array
   short val;
@@ -695,7 +700,7 @@ void ArduEyeSMHClass::getImageRowSum(short *img, unsigned char rowstart, unsigne
 //	8x8 binning. Grab from input 2.
 /*********************************************************************/
 
-void ArduEyeSMHClass::getImageColSum(short *img, unsigned char rowstart, 					unsigned char numrows, unsigned char 					rowskip, unsigned char colstart, unsigned 					char numcols, unsigned char colskip, char 					ADCType,char anain) 
+void ArduEyeSMHClass::getImageColSum(short *img, unsigned char rowstart, unsigned char numrows, unsigned char rowskip, unsigned char colstart, unsigned char numcols, unsigned char colskip, char ADCType,char anain) 
 {
   short *pimg = img; // pointer to output image array
   short val,total=0;
@@ -787,7 +792,9 @@ void ArduEyeSMHClass::getImageColSum(short *img, unsigned char rowstart, 					un
 /*********************************************************************/
 //	findMax
 //	Searches over a block section of a Stonyman or Hawksbill chip
-//	to find the brightest pixel. This function is intended to be used //	for things like finding the location of a pinhole in response to //	a bright light.
+//	to find the brightest pixel. This function is intended to be used 
+//	for things like finding the location of a pinhole in response to 
+//	a bright light.
 //
 //	VARIABLES: 
 //	rowstart: first row to search
@@ -798,7 +805,8 @@ void ArduEyeSMHClass::getImageColSum(short *img, unsigned char rowstart, 					un
 //	colskip: skipping between columns
 //	ADCType: which ADC to use, defined ADC_TYPES
 //	anain (0,1,2,3): which analog input to use
-//	rowwinner: (output) pointer to variable to write row of brightest //	pixel
+//	rowwinner: (output) pointer to variable to write row of brightest 
+//	pixel
 //	colwinner: (output) pointer to variable to write column of 
 //	brightest pixel
 //
@@ -809,7 +817,7 @@ void ArduEyeSMHClass::getImageColSum(short *img, unsigned char rowstart, 					un
 //	onboard ADC, chip 0
 /*********************************************************************/
 
-void ArduEyeSMHClass::findMax(unsigned char rowstart, unsigned char 					numrows, unsigned char rowskip, unsigned 					char colstart, unsigned char numcols, 					unsigned char colskip, char ADCType,char 					anain,unsigned char *max_row, unsigned 					char *max_col)
+void ArduEyeSMHClass::findMax(unsigned char rowstart, unsigned char numrows, unsigned char rowskip, unsigned char colstart, unsigned char numcols,unsigned char colskip, char ADCType,char anain,unsigned char *max_row, unsigned char *max_col)
 {
   unsigned short maxval=5000,minval=0,val;
   unsigned char row,col,bestrow,bestcol;
@@ -912,7 +920,8 @@ void ArduEyeSMHClass::findMax(unsigned char rowstart, unsigned char 					numrows
 /*********************************************************************/
 //	chipToMatlab
 //	This function dumps the entire contents of a Stonyman or 
-//	Hawksbill chip to the Serial monitor in a form that may be copied //	into Matlab. The image is written be stored in matrix Img. 
+//	Hawksbill chip to the Serial monitor in a form that may be copied 
+//	into Matlab. The image is written be stored in matrix Img. 
 //
 //	VARIABLES: 
 //	whichchip(0 or 1): 0 for Stonyman, 1 for Hawksbill
@@ -920,7 +929,7 @@ void ArduEyeSMHClass::findMax(unsigned char rowstart, unsigned char 					numrows
 //	anain (0,1,2,3): Selects one analog input
 /*********************************************************************/
 
-void ArduEyeSMHClass::chipToMatlab(char whichchip,char ADCType, char 						anain) 
+void ArduEyeSMHClass::chipToMatlab(char whichchip,char ADCType, char anain) 
 {
   unsigned char row,col,rows,cols;
   unsigned short val;
@@ -1000,7 +1009,8 @@ void ArduEyeSMHClass::chipToMatlab(char whichchip,char ADCType, char 						anain
 /*********************************************************************/
 //	sectionToMatlab
 //	This function dumps a box section of a Stonyman or Hawksbill 
-//	to the Serial monitor in a form that may be copied into Matlab. //	The image is written to be stored in matrix Img. 
+//	to the Serial monitor in a form that may be copied into Matlab. 
+//	The image is written to be stored in matrix Img. 
 //
 //	VARIABLES: 
 //	rowstart: first row to acquire
@@ -1017,10 +1027,11 @@ void ArduEyeSMHClass::chipToMatlab(char whichchip,char ADCType, char 						anain
 //	Grab an 8x8 window of pixels at raw resolution starting at row 
 //	16, column 24, from onboard ADC at chip 0
 //	sectionToMatlab(0,14,8,0,14,8,SMH1_ADCTYPE_ONBOARD,2): 
-//	Grab entire Stonyman chip when using 8x8 binning. Grab from input //	2.
+//	Grab entire Stonyman chip when using 8x8 binning. Grab from input 
+//	2.
 /*********************************************************************/
 
-void ArduEyeSMHClass::sectionToMatlab(unsigned char rowstart, 							  unsigned char numrows, unsigned 						  char rowskip, unsigned char 						  colstart, unsigned char numcols, 						  unsigned char colskip, char 						  ADCType, unsigned char anain) 
+void ArduEyeSMHClass::sectionToMatlab(unsigned char rowstart, unsigned char numrows, unsigned char rowskip, unsigned char colstart, unsigned char numcols, unsigned char colskip, char ADCType, unsigned char anain) 
 {
   short val;
   unsigned char row,col;

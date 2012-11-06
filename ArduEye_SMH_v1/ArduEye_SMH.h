@@ -61,7 +61,7 @@ policies, either expressed or implied, of Centeye, Inc.
 
 #if defined(__AVR_ATmega2560__)
    	#  include "pin_defs_2560.h"	//2560 defs
-#elif defined (__AVR_ATmega8__)||(__AVR_ATmega168__)|  	(__AVR_ATmega168P__)||(__AVR_ATmega328P__)
+#elif defined (__AVR_ATmega8__)||(__AVR_ATmega168__)|(__AVR_ATmega168P__)||(__AVR_ATmega328P__)
 	#  include "pin_defs_168_328.h"	//8/168/328 defs
 #else 
 	#  error "Code only supports ATmega 2560 and ATmega 8/168/328"
@@ -186,8 +186,7 @@ public:
 /*********************************************************************/
 // Initialize the vision chip for image readout
   
-  void begin(short vref=SMH_VREF_5V0,short nbias=SMH_NBIAS_5V0,short 	aobias=SMH_AOBIAS_5V0,char gain=SMH_GAIN_DEFAULT,char
-	selamp=SMH_SELAMP_DEFAULT); 
+  void begin(short vref=SMH_VREF_5V0,short nbias=SMH_NBIAS_5V0,short aobias=SMH_AOBIAS_5V0,char gain=SMH_GAIN_DEFAULT,char selamp=SMH_SELAMP_DEFAULT); 
 
 /*********************************************************************/
 // Chip Register and Value Manipulation
@@ -244,28 +243,28 @@ public:
 // Image Functions
 
   //given an image, returns a fixed-pattern noise mask and mask_base
-  void calcMask(short *img, short size, unsigned char *mask, short 	*mask_base);
+  void calcMask(short *img, short size, unsigned char *mask, short *mask_base);
 
   //applies pre-calculated FPN mask to an image
-  void applyMask(short *img, short size, unsigned char *mask, short 	mask_base);
+  void applyMask(short *img, short size, unsigned char *mask, short mask_base);
 
   //gets an image from the vision chip
-  void getImage(short *img, unsigned char rowstart, unsigned char 	numrows, unsigned char rowskip, unsigned char colstart, unsigned 	char numcols, unsigned char colskip, char ADCType,char anain);
+  void getImage(short *img, unsigned char rowstart, unsigned char numrows, unsigned char rowskip, unsigned char colstart, unsigned 	char numcols, unsigned char colskip, char ADCType,char anain);
 
   //gets a image from the vision chip, sums each row and returns one pixel for the row
-  void getImageRowSum(short *img, unsigned char rowstart, unsigned char 	numrows, unsigned char rowskip, unsigned char colstart, unsigned 	char numcols, unsigned char colskip, char ADCType,char anain);
+  void getImageRowSum(short *img, unsigned char rowstart, unsigned char numrows, unsigned char rowskip, unsigned char colstart, unsigned 	char numcols, unsigned char colskip, char ADCType,char anain);
  
   //gets a image from the vision chip, sums each col and returns one pixel for the col
-  void getImageColSum(short *img, unsigned char rowstart, unsigned char 	numrows, unsigned char rowskip, unsigned char colstart, unsigned 	char numcols, unsigned char colskip, char ADCType,char anain);
+  void getImageColSum(short *img, unsigned char rowstart, unsigned char numrows, unsigned char rowskip, unsigned char colstart, unsigned 	char numcols, unsigned char colskip, char ADCType,char anain);
 
   //takes an image and returns the maximum value row and col
-  void findMax(unsigned char rowstart, unsigned char numrows, 	unsigned char rowskip, unsigned char colstart, unsigned char 	numcols, unsigned char colskip, char ADCType,char anain,unsigned 	char *max_row, unsigned char *max_col);
+  void findMax(unsigned char rowstart, unsigned char numrows, unsigned char rowskip, unsigned char colstart, unsigned char numcols, unsigned char colskip, char ADCType,char anain,unsigned char *max_row, unsigned char *max_col);
 
   //prints the entire vision chip over serial as a Matlab array
   void chipToMatlab(char whichchip,char ADCType,char anain);
 
   //prints a section of the vision chip over serial as a Matlab array
-  void sectionToMatlab(unsigned char rowstart, unsigned char 	numrows, unsigned char rowskip, unsigned char colstart, unsigned 	char numcols, unsigned char colskip, char ADCType, unsigned char 	anain);   
+  void sectionToMatlab(unsigned char rowstart, unsigned char numrows, unsigned char rowskip, unsigned char colstart, unsigned char numcols, unsigned char colskip, char ADCType, unsigned char 	anain);   
 
 };
 
